@@ -30,6 +30,7 @@ func (c *Controller) HandlerCreate() gin.HandlerFunc {
 				"message": "bad request",
 				"error":   err,
 			})
+			return
 		}
 
 		producto, err := c.service.Create(ctx, productRequest)
@@ -37,6 +38,7 @@ func (c *Controller) HandlerCreate() gin.HandlerFunc {
 			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"message": "Internal server error",
 			})
+			return
 		}
 
 		ctx.JSON(http.StatusOK, gin.H{
@@ -56,6 +58,7 @@ func (c *Controller) HandlerGetAll() gin.HandlerFunc {
 			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"message": "Internal server error",
 			})
+			return
 		}
 
 		ctx.JSON(http.StatusOK, gin.H{
@@ -77,6 +80,7 @@ func (c *Controller) HandlerGetByID() gin.HandlerFunc {
 			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"message": "Internal server error",
 			})
+			return
 		}
 
 		ctx.JSON(http.StatusOK, gin.H{
@@ -101,6 +105,7 @@ func (c *Controller) HandlerUpdate() gin.HandlerFunc {
 				"message": "bad request",
 				"error":   err,
 			})
+			return
 		}
 
 		// Llamamos al servicio
@@ -109,6 +114,7 @@ func (c *Controller) HandlerUpdate() gin.HandlerFunc {
 			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"message": "Internal server error",
 			})
+			return
 		}
 
 		ctx.JSON(http.StatusOK, gin.H{
@@ -130,6 +136,7 @@ func (c *Controller) HandlerDelete() gin.HandlerFunc {
 			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"message": "Internal server error",
 			})
+			return
 		}
 
 		ctx.JSON(http.StatusOK, gin.H{
