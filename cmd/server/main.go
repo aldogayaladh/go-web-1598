@@ -8,10 +8,18 @@ import (
 	handlerProducto "github.com/aldogayaladh/go-web-1598/cmd/server/handler/products"
 	"github.com/aldogayaladh/go-web-1598/internal/domain"
 	"github.com/aldogayaladh/go-web-1598/internal/products"
+	"github.com/aldogayaladh/go-web-1598/pkg/middleware"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+
+	// Cargar las variables de entorno
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	// Carga la base de datos en memoria
 	db := LoadStore()
@@ -24,7 +32,9 @@ func main() {
 	service := products.NewServiceProduct(repostory)
 	controllerProduct := handlerProducto.NewControllerProducts(service)
 
-	engine := gin.Default()
+	engine := gin.New()
+	engine.Use(gin.Recovery())
+	engine.Use(middleware.Logger())
 
 	group := engine.Group("/api/v1")
 	{
@@ -32,11 +42,11 @@ func main() {
 
 		grupoProducto := group.Group("/producto")
 		{
-			grupoProducto.POST("", controllerProduct.HandlerCreate())
-			grupoProducto.GET("", controllerProduct.HandlerGetAll())
+			grupoProducto.POST("", middleware.Authenticate(), controllerProduct.HandlerCreate())
+			grupoProducto.GET("", middleware.Authenticate(), controllerProduct.HandlerGetAll())
 			grupoProducto.GET("/:id", controllerProduct.HandlerGetByID())
-			grupoProducto.PUT("/:id", controllerProduct.HandlerUpdate())
-			grupoProducto.DELETE("/:id", controllerProduct.HandlerDelete())
+			grupoProducto.PUT("/:id", middleware.Authenticate(), controllerProduct.HandlerUpdate())
+			grupoProducto.DELETE("/:id", middleware.Authenticate(), controllerProduct.HandlerDelete())
 
 		}
 

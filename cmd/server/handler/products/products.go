@@ -55,6 +55,7 @@ func (c *Controller) HandlerGetAll() gin.HandlerFunc {
 		newContext := addValueToContext(ctx)
 		listProducts, err := c.service.GetAll(newContext)
 		if err != nil {
+
 			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
 				"message": "Internal server error",
 			})
