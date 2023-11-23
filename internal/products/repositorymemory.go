@@ -13,14 +13,6 @@ var (
 	ErrNotFound = errors.New("product not found")
 )
 
-type Repository interface {
-	Create(ctx context.Context, producto domain.Producto) (domain.Producto, error)
-	GetAll(ctx context.Context) ([]domain.Producto, error)
-	GetByID(ctx context.Context, id string) (domain.Producto, error)
-	Update(ctx context.Context, producto domain.Producto, id string) (domain.Producto, error)
-	Delete(ctx context.Context, id string) error
-}
-
 type repository struct {
 	db []domain.Producto
 }
@@ -53,7 +45,7 @@ func (r *repository) GetAll(ctx context.Context) ([]domain.Producto, error) {
 }
 
 // GetByID .....
-func (r *repository) GetByID(ctx context.Context, id string) (domain.Producto, error) {
+func (r *repository) GetByID(ctx context.Context, id int) (domain.Producto, error) {
 	var result domain.Producto
 	for _, value := range r.db {
 		if value.Id == id {
@@ -62,7 +54,7 @@ func (r *repository) GetByID(ctx context.Context, id string) (domain.Producto, e
 		}
 	}
 
-	if result.Id == "" {
+	if result.Id < 1 {
 		return domain.Producto{}, ErrNotFound
 	}
 
@@ -73,7 +65,7 @@ func (r *repository) GetByID(ctx context.Context, id string) (domain.Producto, e
 func (r *repository) Update(
 	ctx context.Context,
 	producto domain.Producto,
-	id string) (domain.Producto, error) {
+	id int) (domain.Producto, error) {
 
 	var result domain.Producto
 	for key, value := range r.db {
@@ -85,7 +77,7 @@ func (r *repository) Update(
 		}
 	}
 
-	if result.Id == "" {
+	if result.Id < 1 {
 		return domain.Producto{}, ErrNotFound
 	}
 
@@ -94,7 +86,7 @@ func (r *repository) Update(
 }
 
 // Delete ...
-func (r *repository) Delete(ctx context.Context, id string) error {
+func (r *repository) Delete(ctx context.Context, id int) error {
 	var result domain.Producto
 	for key, value := range r.db {
 		if value.Id == id {
@@ -104,7 +96,7 @@ func (r *repository) Delete(ctx context.Context, id string) error {
 		}
 	}
 
-	if result.Id == "" {
+	if result.Id < 1 {
 		return ErrNotFound
 	}
 

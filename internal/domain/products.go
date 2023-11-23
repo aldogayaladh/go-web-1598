@@ -4,7 +4,7 @@ import "time"
 
 // Producto es una estructura que define ...
 type Producto struct {
-	Id          string    `json:"id"`
+	Id          int       `json:"id"`
 	Name        string    `json:"name"`
 	Quantity    int       `json:"quantity"`
 	CodeValue   string    `json:"code_value"`
