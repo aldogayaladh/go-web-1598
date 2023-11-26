@@ -1,181 +1,226 @@
-package products
+package producto
 
 import (
-	"context"
 	"net/http"
 	"strconv"
 
 	"github.com/aldogayaladh/go-web-1598/internal/domain"
 	"github.com/aldogayaladh/go-web-1598/internal/products"
+	"github.com/aldogayaladh/go-web-1598/pkg/web"
 	"github.com/gin-gonic/gin"
 )
 
-type Controller struct {
+type Controlador struct {
 	service products.Service
 }
 
-func NewControllerProducts(service products.Service) *Controller {
-	return &Controller{service: service}
+func NewControladorProducto(service products.Service) *Controlador {
+	return &Controlador{
+		service: service,
+	}
 }
 
-// Doc ...
-func (c *Controller) HandlerCreate() gin.HandlerFunc {
+// Producto godoc
+// @Summary producto example
+// @Description Create a new producto
+// @Tags producto
+// @Accept json
+// @Produce json
+// @Success 200 {object} web.response
+// @Failure 400 {object} web.errorResponse
+// @Failure 500 {object} web.errorResponse
+// @Router /productos [post]
+func (c *Controlador) HandlerCreate() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
-		var productRequest domain.Producto
+		var request domain.Producto
 
-		err := ctx.Bind(&productRequest)
+		err := ctx.Bind(&request)
 
 		if err != nil {
-			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-				"message": "bad request",
-				"error":   err,
-			})
+			web.Error(ctx, http.StatusBadRequest, "%s", "bad request")
 			return
 		}
 
-		producto, err := c.service.Create(ctx, productRequest)
+		product, err := c.service.Create(ctx, request)
 		if err != nil {
-			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"message": "Internal server error",
-			})
+			web.Error(ctx, http.StatusInternalServerError, "%s", "internal server error")
 			return
 		}
 
-		ctx.JSON(http.StatusOK, gin.H{
-			"data": producto,
+		web.Success(ctx, http.StatusOK, gin.H{
+			"data": product,
 		})
 
 	}
 }
 
-// Doc ...
-func (c *Controller) HandlerGetAll() gin.HandlerFunc {
+// Producto godoc
+// @Summary producto example
+// @Description Get all productos
+// @Tags producto
+// @Accept json
+// @Produce json
+// @Success 200 {object} web.response
+// @Failure 500 {object} web.errorResponse
+// @Router /productos [get]
+func (c *Controlador) HandlerGetAll() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
+		productos, err := c.service.GetAll(ctx)
 
-		newContext := addValueToContext(ctx)
-		listProducts, err := c.service.GetAll(newContext)
 		if err != nil {
-
-			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"message": "Internal server error",
-			})
+			web.Error(ctx, http.StatusInternalServerError, "%s", "internal server error")
 			return
 		}
 
-		ctx.JSON(http.StatusOK, gin.H{
-			"data": listProducts,
+		web.Success(ctx, http.StatusOK, gin.H{
+			"data": productos,
 		})
 	}
 }
 
-// Doc ...
-func (c *Controller) HandlerGetByID() gin.HandlerFunc {
+// Producto godoc
+// @Summary producto example
+// @Description Get producto by id
+// @Tags producto
+// @Param id path int true "id del producto"
+// @Accept json
+// @Produce json
+// @Success 200 {object} web.response
+// @Failure 400 {object} web.errorResponse
+// @Failure 500 {object} web.errorResponse
+// @Router /productos/:id [get]
+func (c *Controlador) HandlerGetByID() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-
-		// Recuperamos el id de la request
-		idParam := ctx.Param("id")
-
-		id, err := strconv.Atoi(idParam)
+		id, err := strconv.Atoi(ctx.Param("id"))
 		if err != nil {
-			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-				"message": "bad request",
-				"error":   err,
-			})
+			web.Error(ctx, http.StatusBadRequest, "%s", "id invalido")
 			return
 		}
 
-		// Llamamos al servicio
-		producto, err := c.service.GetByID(ctx, id)
+		product, err := c.service.GetByID(ctx, id)
 		if err != nil {
-			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"message": "Internal server error",
-			})
+			web.Error(ctx, http.StatusInternalServerError, "%s", "internal server error")
 			return
 		}
 
-		ctx.JSON(http.StatusOK, gin.H{
-			"data": producto,
+		web.Success(ctx, http.StatusOK, gin.H{
+			"data": product,
 		})
 	}
 }
 
-// Doc ...
-func (c *Controller) HandlerUpdate() gin.HandlerFunc {
+// Producto godoc
+// @Summary producto example
+// @Description Update producto by id
+// @Tags producto
+// @Accept json
+// @Produce json
+// @Success 200 {object} web.response
+// @Failure 400 {object} web.errorResponse
+// @Failure 500 {object} web.errorResponse
+// @Router /productos/:id [put]
+func (c *Controlador) HandlerUpdate() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 
-		// Recuperamos el id de la request
-		idParam := ctx.Param("id")
+		var request domain.Producto
 
-		id, err := strconv.Atoi(idParam)
-		if err != nil {
-			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-				"message": "bad request",
-				"error":   err,
-			})
+		errBind := ctx.Bind(&request)
+
+		if errBind != nil {
+			web.Error(ctx, http.StatusBadRequest, "%s", "bad request binding")
 			return
 		}
 
-		var productRequest domain.Producto
+		id := ctx.Param("id")
 
-		err = ctx.Bind(&productRequest)
+		idInt, err := strconv.Atoi(id)
 
 		if err != nil {
-			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-				"message": "bad request",
-				"error":   err,
-			})
+			web.Error(ctx, http.StatusBadRequest, "%s", "bad request param")
 			return
 		}
 
-		// Llamamos al servicio
-		producto, err := c.service.Update(ctx, productRequest, id)
+		product, err := c.service.Update(ctx, request, idInt)
 		if err != nil {
-			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"message": "Internal server error",
-			})
+			web.Error(ctx, http.StatusInternalServerError, "%s", "internal server error")
 			return
 		}
 
-		ctx.JSON(http.StatusOK, gin.H{
-			"data": producto,
+		web.Success(ctx, http.StatusOK, gin.H{
+			"data": product,
 		})
+
 	}
 }
 
-// Doc ...
-func (c *Controller) HandlerDelete() gin.HandlerFunc {
+// Producto godoc
+// @Summary producto example
+// @Description Delete producto by id
+// @Tags producto
+// @Param id path int true "id del producto"
+// @Accept json
+// @Produce json
+// @Success 200 {object} web.response
+// @Failure 400 {object} web.errorResponse
+// @Failure 500 {object} web.errorResponse
+// @Router /productos/:id [delete]
+func (c *Controlador) HandlerDelete() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-
-		// Recuperamos el id de la request
-		idParam := ctx.Param("id")
-
-		id, err := strconv.Atoi(idParam)
+		id, err := strconv.Atoi(ctx.Param("id"))
 		if err != nil {
-			ctx.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-				"message": "bad request",
-				"error":   err,
-			})
+			web.Error(ctx, http.StatusBadRequest, "%s", "id invalido")
 			return
 		}
 
-		// Llamamos al servicio
 		err = c.service.Delete(ctx, id)
 		if err != nil {
-			ctx.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{
-				"message": "Internal server error",
-			})
+			web.Error(ctx, http.StatusInternalServerError, "%s", "internal server error")
 			return
 		}
 
-		ctx.JSON(http.StatusOK, gin.H{
-			"message": "Producto eliminado",
+		web.Success(ctx, http.StatusOK, gin.H{
+			"mensaje": "producto eliminado",
 		})
 	}
 }
 
-// addValueToContext ...
-func addValueToContext(ctx context.Context) context.Context {
-	newContext := context.WithValue(ctx, "rol", "admin")
-	return newContext
+// Producto godoc
+// @Summary producto example
+// @Description Patch producto
+// @Tags producto
+// @Param id path int true "id del producto"
+// @Accept json
+// @Produce json
+// @Success 200 {object} web.response
+// @Failure 400 {object} web.errorResponse
+// @Failure 500 {object} web.errorResponse
+// @Router /productos/:id [patch]
+func (c *Controlador) HandlerPatch() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		id, err := strconv.Atoi(ctx.Param("id"))
+		if err != nil {
+			web.Error(ctx, http.StatusBadRequest, "%s", "id invalido")
+			return
+		}
+
+		var request domain.Producto
+
+		errBind := ctx.Bind(&request)
+
+		if errBind != nil {
+			web.Error(ctx, http.StatusBadRequest, "%s", "bad request binding")
+			return
+		}
+
+		product, err := c.service.Patch(ctx, request, id)
+		if err != nil {
+			web.Error(ctx, http.StatusInternalServerError, "%s", "internal server error")
+			return
+		}
+
+		web.Success(ctx, http.StatusOK, gin.H{
+			"data": product,
+		})
+	}
 }

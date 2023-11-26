@@ -23,7 +23,7 @@ func NewMySqlRepository(db *sql.DB) Repository {
 	return &repositorymysql{db: db}
 }
 
-// Create ....
+// Create is a method that creates a new product.
 func (r *repositorymysql) Create(ctx context.Context, producto domain.Producto) (domain.Producto, error) {
 	statement, err := r.db.Prepare(QueryInsertProduct)
 	if err != nil {
@@ -56,27 +56,150 @@ func (r *repositorymysql) Create(ctx context.Context, producto domain.Producto) 
 
 }
 
-// GetAll...
+// GetAll is a method that returns all products.
 func (r *repositorymysql) GetAll(ctx context.Context) ([]domain.Producto, error) {
-	panic("Implement me")
+	rows, err := r.db.Query(QueryGetAllProducts)
+	if err != nil {
+		return []domain.Producto{}, err
+	}
+
+	defer rows.Close()
+
+	var productos []domain.Producto
+
+	for rows.Next() {
+		var producto domain.Producto
+		err := rows.Scan(
+			&producto.Id,
+			&producto.Name,
+			&producto.Quantity,
+			&producto.CodeValue,
+			&producto.IsPublished,
+			&producto.Expiration,
+			&producto.Price,
+		)
+		if err != nil {
+			return []domain.Producto{}, err
+		}
+
+		productos = append(productos, producto)
+	}
+
+	if err := rows.Err(); err != nil {
+		return []domain.Producto{}, err
+	}
+
+	return productos, nil
 }
 
-// GetByID .....
+// GetByID is a method that returns a product by ID.
 func (r *repositorymysql) GetByID(ctx context.Context, id int) (domain.Producto, error) {
-	panic("Implement me")
+	row := r.db.QueryRow(QueryGetProductById, id)
+
+	var producto domain.Producto
+	err := row.Scan(
+		&producto.Id,
+		&producto.Name,
+		&producto.Quantity,
+		&producto.CodeValue,
+		&producto.IsPublished,
+		&producto.Expiration,
+		&producto.Price,
+	)
+
+	if err != nil {
+		return domain.Producto{}, err
+	}
+
+	return producto, nil
 }
 
-// Update ...
+// Update is a method that updates a product by ID.
 func (r *repositorymysql) Update(
 	ctx context.Context,
 	producto domain.Producto,
 	id int) (domain.Producto, error) {
+	statement, err := r.db.Prepare(QueryUpdateProduct)
+	if err != nil {
+		return domain.Producto{}, err
+	}
 
-	panic("Implement me")
+	defer statement.Close()
+
+	result, err := statement.Exec(
+		producto.Name,
+		producto.Quantity,
+		producto.CodeValue,
+		producto.IsPublished,
+		producto.Expiration,
+		producto.Price,
+		producto.Id,
+	)
+
+	if err != nil {
+		return domain.Producto{}, err
+	}
+
+	_, err = result.RowsAffected()
+	if err != nil {
+		return domain.Producto{}, err
+	}
+
+	producto.Id = id
+
+	return producto, nil
 
 }
 
-// Delete ...
+// Delete is a method that deletes a product by ID.
 func (r *repositorymysql) Delete(ctx context.Context, id int) error {
-	panic("Implement me")
+	result, err := r.db.Exec(QueryDeleteProduct, id)
+	if err != nil {
+		return err
+	}
+
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return err
+	}
+
+	if rowsAffected < 1 {
+		return ErrNotFound
+	}
+
+	return nil
+}
+
+// Patch is a method that updates a product by ID.
+func (r *repositorymysql) Patch(
+	ctx context.Context,
+	producto domain.Producto,
+	id int) (domain.Producto, error) {
+	statement, err := r.db.Prepare(QueryUpdateProduct)
+	if err != nil {
+		return domain.Producto{}, err
+	}
+
+	defer statement.Close()
+
+	result, err := statement.Exec(
+		producto.Name,
+		producto.Quantity,
+		producto.CodeValue,
+		producto.IsPublished,
+		producto.Expiration,
+		producto.Price,
+		producto.Id,
+	)
+
+	if err != nil {
+		return domain.Producto{}, err
+	}
+
+	_, err = result.RowsAffected()
+	if err != nil {
+		return domain.Producto{}, err
+	}
+
+	return producto, nil
 }

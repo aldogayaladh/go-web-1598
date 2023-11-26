@@ -4,116 +4,113 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
-	"time"
+	"os"
 
-	handlerPing "github.com/aldogayaladh/go-web-1598/cmd/server/handler/ping"
-	handlerProducto "github.com/aldogayaladh/go-web-1598/cmd/server/handler/products"
-	"github.com/aldogayaladh/go-web-1598/internal/domain"
-	"github.com/aldogayaladh/go-web-1598/internal/products"
+	routes "github.com/aldogayaladh/go-web-1598/cmd/server/router"
 	"github.com/aldogayaladh/go-web-1598/pkg/middleware"
 	"github.com/gin-gonic/gin"
-	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
+
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
+	_ "github.com/aldogayaladh/go-web-1598/docs"
+	_ "github.com/go-sql-driver/mysql"
 )
 
+const (
+	puerto = "8080"
+)
+
+// @title           Swagger Example API
+// @version         1.0
+// @description     This is a sample server celler server.
+// @termsOfService  http://swagger.io/terms/
+
+// @contact.name   API Support
+// @contact.url    http://www.swagger.io/support
+// @contact.email  support@swagger.io
+
+// @license.name  Apache 2.0
+// @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
+
+// @host      localhost:8080
+// @BasePath  /api/v1
+
+// @securityDefinitions.basic  BasicAuth
+
+// @externalDocs.description  OpenAPI
+// @externalDocs.url          https://swagger.io/resources/open-api/
 func main() {
 
-	// Cargar las variables de entorno
+	// Recover from panic.
+	defer func() {
+		if err := recover(); err != nil {
+			log.Fatal(err)
+			os.Exit(1)
+		}
+	}()
+
+	// Load the environment variables.
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Carga la base de datos en memoria
-	//db := LoadStore()
+	// Connect to the database.
 	db := connectDB()
 
-	// Ping.
-	controllerPing := handlerPing.NewControllerPing()
+	// Create a new Gin engine.
+	router := gin.New()
+	router.Use(gin.Recovery())
+	// Add the logger middleware.
+	router.Use(middleware.Logger())
 
-	// Products.
-	//repostory := products.NewMemoryRepository(db)
-	repositoryMysl := products.NewMySqlRepository(db)
-	service := products.NewServiceProduct(repositoryMysl)
-	controllerProduct := handlerProducto.NewControllerProducts(service)
+	// Add the swagger handler.
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
-	engine := gin.New()
-	engine.Use(gin.Recovery())
-	engine.Use(middleware.Logger())
+	// Run the application.
+	runApp(db, router)
 
-	group := engine.Group("/api/v1")
-	{
-		group.GET("/ping", controllerPing.HandlerPing())
+	// Close the connection.
+	defer db.Close()
 
-		grupoProducto := group.Group("/producto")
-		{
-			grupoProducto.POST("", middleware.Authenticate(), controllerProduct.HandlerCreate())
-			grupoProducto.GET("", middleware.Authenticate(), controllerProduct.HandlerGetAll())
-			grupoProducto.GET("/:id", controllerProduct.HandlerGetByID())
-			grupoProducto.PUT("/:id", middleware.Authenticate(), controllerProduct.HandlerUpdate())
-			grupoProducto.DELETE("/:id", middleware.Authenticate(), controllerProduct.HandlerDelete())
+}
 
-		}
-
-	}
-
-	if err := engine.Run(":8080"); err != nil {
-		log.Fatal(err)
+func runApp(db *sql.DB, engine *gin.Engine) {
+	// Run the application.
+	router := routes.NewRouter(engine, db)
+	// Map all routes.
+	router.MapRoutes()
+	if err := engine.Run(fmt.Sprintf(":%s", puerto)); err != nil {
+		panic(err)
 	}
 
 }
 
-// LoadStore carga la base de datos en memoria
-func LoadStore() []domain.Producto {
-	return []domain.Producto{
-		{
-			Id:          1,
-			Name:        "Coco Cola",
-			Quantity:    10,
-			CodeValue:   "123456789",
-			IsPublished: true,
-			Expiration:  time.Now(),
-			Price:       10.5,
-		},
-		{
-			Id:          2,
-			Name:        "Pepsito",
-			Quantity:    10,
-			CodeValue:   "123456789",
-			IsPublished: true,
-			Expiration:  time.Now(),
-			Price:       8.5,
-		},
-		{
-			Id:          3,
-			Name:        "Fantastica",
-			Quantity:    10,
-			CodeValue:   "123456789",
-			IsPublished: true,
-			Expiration:  time.Now(),
-			Price:       5.5,
-		},
-	}
-}
-
+// connectDB connects to the database.
 func connectDB() *sql.DB {
 	var dbUsername, dbPassword, dbHost, dbPort, dbName string
 	dbUsername = "root"
 	dbPassword = ""
 	dbHost = "localhost"
 	dbPort = "3306"
-	dbName = "storage"
+	dbName = "my_db"
 
-	// string de conexion
-	// "username:password@tcp(host:puerto)/base_datos"
-	datasource := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", dbUsername, dbPassword, dbHost, dbPort, dbName)
+	// Create the data source.
+	dataSource := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?parseTime=true", dbUsername, dbPassword, dbHost, dbPort, dbName)
 
-	db, err := sql.Open("mysql", datasource)
+	// Open the connection.
+	db, err := sql.Open("mysql", dataSource)
+
 	if err != nil {
 		panic(err)
 	}
 
-	if err := db.Ping(); err != nil {
+	// Check the connection.
+	err = db.Ping()
+
+	if err != nil {
 		panic(err)
 	}
 

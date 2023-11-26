@@ -12,4 +12,5 @@ type Repository interface {
 	GetByID(ctx context.Context, id int) (domain.Producto, error)
 	Update(ctx context.Context, producto domain.Producto, id int) (domain.Producto, error)
 	Delete(ctx context.Context, id int) error
+	Patch(ctx context.Context, producto domain.Producto, id int) (domain.Producto, error)
 }

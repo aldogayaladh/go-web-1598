@@ -22,13 +22,13 @@ func NewMemoryRepository(db []domain.Producto) Repository {
 	return &repository{db: db}
 }
 
-// Create ....
+// Create is a method that creates a new product.
 func (r *repository) Create(ctx context.Context, producto domain.Producto) (domain.Producto, error) {
 	r.db = append(r.db, producto)
 	return producto, nil
 }
 
-// GetAll...
+// GetAll is a method that returns all products.
 func (r *repository) GetAll(ctx context.Context) ([]domain.Producto, error) {
 
 	contenidoContext := ctx.Value("rol")
@@ -44,7 +44,7 @@ func (r *repository) GetAll(ctx context.Context) ([]domain.Producto, error) {
 	return r.db, nil
 }
 
-// GetByID .....
+// GetByID is a method that returns a product by ID.
 func (r *repository) GetByID(ctx context.Context, id int) (domain.Producto, error) {
 	var result domain.Producto
 	for _, value := range r.db {
@@ -61,7 +61,7 @@ func (r *repository) GetByID(ctx context.Context, id int) (domain.Producto, erro
 	return result, nil
 }
 
-// Update ...
+// Update is a method that updates a product by ID.
 func (r *repository) Update(
 	ctx context.Context,
 	producto domain.Producto,
@@ -85,7 +85,7 @@ func (r *repository) Update(
 
 }
 
-// Delete ...
+// Delete is a method that deletes a product by ID.
 func (r *repository) Delete(ctx context.Context, id int) error {
 	var result domain.Producto
 	for key, value := range r.db {
@@ -101,4 +101,43 @@ func (r *repository) Delete(ctx context.Context, id int) error {
 	}
 
 	return nil
+}
+
+// Patch is a method that updates a product by ID.
+func (r *repository) Patch(
+	ctx context.Context,
+	producto domain.Producto,
+	id int) (domain.Producto, error) {
+
+	var result domain.Producto
+	for key, value := range r.db {
+		if value.Id == id {
+			if producto.Name != "" {
+				r.db[key].Name = producto.Name
+			}
+			if producto.CodeValue != "" {
+				r.db[key].CodeValue = producto.CodeValue
+			}
+			if producto.Quantity > 0 {
+				r.db[key].Quantity = producto.Quantity
+			}
+			if producto.Price > 0 {
+				r.db[key].Price = producto.Price
+			}
+			if producto.Expiration != (domain.Producto{}).Expiration {
+				r.db[key].Expiration = producto.Expiration
+			}
+			if producto.IsPublished {
+				r.db[key].IsPublished = producto.IsPublished
+			}
+			result = r.db[key]
+			break
+		}
+	}
+
+	if result.Id < 1 {
+		return domain.Producto{}, ErrNotFound
+	}
+
+	return result, nil
 }
