@@ -48,9 +48,7 @@ func (c *Controlador) HandlerCreate() gin.HandlerFunc {
 			return
 		}
 
-		web.Success(ctx, http.StatusOK, gin.H{
-			"data": product,
-		})
+		web.Success(ctx, http.StatusOK, product)
 
 	}
 }
@@ -73,9 +71,7 @@ func (c *Controlador) HandlerGetAll() gin.HandlerFunc {
 			return
 		}
 
-		web.Success(ctx, http.StatusOK, gin.H{
-			"data": productos,
-		})
+		web.Success(ctx, http.StatusOK, productos)
 	}
 }
 
@@ -104,9 +100,7 @@ func (c *Controlador) HandlerGetByID() gin.HandlerFunc {
 			return
 		}
 
-		web.Success(ctx, http.StatusOK, gin.H{
-			"data": product,
-		})
+		web.Success(ctx, http.StatusOK, product)
 	}
 }
 
@@ -147,9 +141,7 @@ func (c *Controlador) HandlerUpdate() gin.HandlerFunc {
 			return
 		}
 
-		web.Success(ctx, http.StatusOK, gin.H{
-			"data": product,
-		})
+		web.Success(ctx, http.StatusOK, product)
 
 	}
 }
@@ -179,9 +171,7 @@ func (c *Controlador) HandlerDelete() gin.HandlerFunc {
 			return
 		}
 
-		web.Success(ctx, http.StatusOK, gin.H{
-			"mensaje": "producto eliminado",
-		})
+		web.Success(ctx, http.StatusOK, "producto eliminado")
 	}
 }
 
@@ -219,8 +209,6 @@ func (c *Controlador) HandlerPatch() gin.HandlerFunc {
 			return
 		}
 
-		web.Success(ctx, http.StatusOK, gin.H{
-			"data": product,
-		})
+		web.Success(ctx, http.StatusOK, product)
 	}
 }
