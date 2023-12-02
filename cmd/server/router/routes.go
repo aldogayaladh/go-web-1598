@@ -57,7 +57,7 @@ func (r *router) buildProductRoutes() {
 	service := producto.NewServiceProduct(repository)
 	controlador := handlerProducto.NewControladorProducto(service)
 
-	grupoProducto := r.routerGroup.Group("/producto")
+	grupoProducto := r.routerGroup.Group("/productos")
 	{
 		grupoProducto.POST("", middleware.Authenticate(), controlador.HandlerCreate())
 		grupoProducto.GET("", middleware.Authenticate(), controlador.HandlerGetAll())

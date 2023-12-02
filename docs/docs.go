@@ -38,6 +38,15 @@ const docTemplate = `{
                     "producto"
                 ],
                 "summary": "producto example",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token de postman",
+                        "name": "tokenPostman",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -65,6 +74,15 @@ const docTemplate = `{
                     "producto"
                 ],
                 "summary": "producto example",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token de postman",
+                        "name": "tokenPostman",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -107,6 +125,13 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "token de postman",
+                        "name": "tokenPostman",
+                        "in": "header",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -142,6 +167,15 @@ const docTemplate = `{
                     "producto"
                 ],
                 "summary": "producto example",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token de postman",
+                        "name": "tokenPostman",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -176,6 +210,13 @@ const docTemplate = `{
                 ],
                 "summary": "producto example",
                 "parameters": [
+                    {
+                        "type": "string",
+                        "description": "token de postman",
+                        "name": "tokenPostman",
+                        "in": "header",
+                        "required": true
+                    },
                     {
                         "type": "integer",
                         "description": "id del producto",
@@ -219,6 +260,13 @@ const docTemplate = `{
                 "summary": "producto example",
                 "parameters": [
                     {
+                        "type": "string",
+                        "description": "token de postman",
+                        "name": "tokenPostman",
+                        "in": "header",
+                        "required": true
+                    },
+                    {
                         "type": "integer",
                         "description": "id del producto",
                         "name": "id",
@@ -226,6 +274,76 @@ const docTemplate = `{
                         "required": true
                     }
                 ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/web.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/web.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/web.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/sale": {
+            "post": {
+                "description": "Create a new sale",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "sale"
+                ],
+                "summary": "sale example",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/web.response"
+                        }
+                    },
+                    "400": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "$ref": "#/definitions/web.errorResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {
+                            "$ref": "#/definitions/web.errorResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/seller": {
+            "post": {
+                "description": "Create a new seller",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "seller"
+                ],
+                "summary": "seller example",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -266,11 +384,6 @@ const docTemplate = `{
             "properties": {
                 "data": {}
             }
-        }
-    },
-    "securityDefinitions": {
-        "BasicAuth": {
-            "type": "basic"
         }
     }
 }`

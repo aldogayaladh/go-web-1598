@@ -24,6 +24,7 @@ func NewControladorProducto(service products.Service) *Controlador {
 // @Summary producto example
 // @Description Create a new producto
 // @Tags producto
+// @Param tokenPostman header string true "token de postman"
 // @Accept json
 // @Produce json
 // @Success 200 {object} web.response
@@ -57,6 +58,7 @@ func (c *Controlador) HandlerCreate() gin.HandlerFunc {
 // @Summary producto example
 // @Description Get all productos
 // @Tags producto
+// @Param tokenPostman header string true "token de postman"
 // @Accept json
 // @Produce json
 // @Success 200 {object} web.response
@@ -80,6 +82,7 @@ func (c *Controlador) HandlerGetAll() gin.HandlerFunc {
 // @Description Get producto by id
 // @Tags producto
 // @Param id path int true "id del producto"
+// @Param tokenPostman header string true "token de postman"
 // @Accept json
 // @Produce json
 // @Success 200 {object} web.response
@@ -108,6 +111,7 @@ func (c *Controlador) HandlerGetByID() gin.HandlerFunc {
 // @Summary producto example
 // @Description Update producto by id
 // @Tags producto
+// @Param tokenPostman header string true "token de postman"
 // @Accept json
 // @Produce json
 // @Success 200 {object} web.response
@@ -150,6 +154,7 @@ func (c *Controlador) HandlerUpdate() gin.HandlerFunc {
 // @Summary producto example
 // @Description Delete producto by id
 // @Tags producto
+// @Param tokenPostman header string true "token de postman"
 // @Param id path int true "id del producto"
 // @Accept json
 // @Produce json
@@ -179,6 +184,7 @@ func (c *Controlador) HandlerDelete() gin.HandlerFunc {
 // @Summary producto example
 // @Description Patch producto
 // @Tags producto
+// @Param tokenPostman header string true "token de postman"
 // @Param id path int true "id del producto"
 // @Accept json
 // @Produce json

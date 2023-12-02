@@ -30,6 +30,12 @@ paths:
       consumes:
       - application/json
       description: Get all productos
+      parameters:
+      - description: token de postman
+        in: header
+        name: tokenPostman
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -48,6 +54,12 @@ paths:
       consumes:
       - application/json
       description: Create a new producto
+      parameters:
+      - description: token de postman
+        in: header
+        name: tokenPostman
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -72,6 +84,11 @@ paths:
       - application/json
       description: Delete producto by id
       parameters:
+      - description: token de postman
+        in: header
+        name: tokenPostman
+        required: true
+        type: string
       - description: id del producto
         in: path
         name: id
@@ -105,6 +122,11 @@ paths:
         name: id
         required: true
         type: integer
+      - description: token de postman
+        in: header
+        name: tokenPostman
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -128,6 +150,11 @@ paths:
       - application/json
       description: Patch producto
       parameters:
+      - description: token de postman
+        in: header
+        name: tokenPostman
+        required: true
+        type: string
       - description: id del producto
         in: path
         name: id
@@ -155,6 +182,12 @@ paths:
       consumes:
       - application/json
       description: Update producto by id
+      parameters:
+      - description: token de postman
+        in: header
+        name: tokenPostman
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -173,7 +206,50 @@ paths:
       summary: producto example
       tags:
       - producto
-securityDefinitions:
-  BasicAuth:
-    type: basic
+  /sale:
+    post:
+      consumes:
+      - application/json
+      description: Create a new sale
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/web.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/web.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/web.errorResponse'
+      summary: sale example
+      tags:
+      - sale
+  /seller:
+    post:
+      consumes:
+      - application/json
+      description: Create a new seller
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/web.response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/web.errorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/web.errorResponse'
+      summary: seller example
+      tags:
+      - seller
 swagger: "2.0"
