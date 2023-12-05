@@ -5,8 +5,11 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"os/signal"
+	"time"
 
 	routes "github.com/aldogayaladh/go-web-1598/cmd/server/router"
+	"github.com/aldogayaladh/go-web-1598/pkg/eureka"
 	"github.com/aldogayaladh/go-web-1598/pkg/middleware"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -19,7 +22,11 @@ import (
 )
 
 const (
-	puerto = "8080"
+	puerto     = "9090"
+	appID      = "service-product-1"
+	appName    = "service-product"
+	statusUp   = "UP"
+	statusDown = "DOWN"
 )
 
 // @title           Swagger Example API
@@ -34,7 +41,7 @@ const (
 // @license.name  Apache 2.0
 // @license.url   http://www.apache.org/licenses/LICENSE-2.0.html
 
-// @host      localhost:8080
+// @host      localhost:9090
 // @BasePath  /api/v1
 
 // @externalDocs.description  OpenAPI
@@ -57,6 +64,28 @@ func main() {
 
 	// Connect to the database.
 	db := connectDB()
+
+	eureka.RegisterApp(appID, appName)
+	time.Sleep(time.Second * 5)
+	eureka.UpdateStatus(appID, appName, statusUp)
+
+	task := eureka.ScheduleHeartbeat(appID, appName)
+
+	channel := make(chan os.Signal)
+	signal.Notify(channel, os.Interrupt)
+
+	go func() {
+		select {
+		case sig := <-channel:
+			_ = sig
+			task.Cancel()
+			eureka.UpdateStatus(appID, appName, statusDown)
+			time.Sleep(time.Second * 5)
+			eureka.DeleteApp(appName, appID)
+			os.Exit(1)
+		}
+
+	}()
 
 	// Create a new Gin engine.
 	router := gin.New()
